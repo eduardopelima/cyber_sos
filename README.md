@@ -1,5 +1,7 @@
 # cyber_sos
 
+https://tiagoalcan.notion.site/Passo-a-passo-Check-06-29bd7765e27380a78fd9c793c9ca7ccf
+
 cp3
 burble
 hydra
